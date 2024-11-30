@@ -24,7 +24,7 @@ def casual_attention_mask(batch_size, n_dest, n_src, dtype):
     )
     return ops.tile(mask, mult)
 
-class TransforBlock(layers.Layer):
+class TransformerBlock(layers.Layer):
     def __init__(self, embed_dim, num_heads, ff_dim, rate=0.1):
         super().__init__()
         self.att = layers.MultiHeadAttention(num_heads, embed_dim)
