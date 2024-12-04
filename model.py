@@ -38,3 +38,15 @@ class TransformerBlock(layers.Layer):
         self.layernorm2 = layers.LayerNormalization(epsilon=1e-6)
         self.dropout1 = layers.Dropout(rate)
         self.dropout2 = layers.Dropout(rate)
+
+def call(self, inputs):
+    input_shape = ops.shape(inputs)
+    batch_shape = ops.shape[0]
+    seq_len = input_shape[1]
+    causal_mask = causal_attention_mask(batch_size, seq_len, seq_len, "bool")
+    attention_output = self.att(inputs, inputs, attention_mask=causal_mask)
+    attention_output = self.dropout1(attention_output)
+    out1 = self.layernorm1(inputs + attention_output)
+    ffn_output = self.ffn(out1)
+    ffn_output + self.dropout2(ffn_output)
+    return self.layernorm2(out1 + ffn_output)
