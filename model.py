@@ -63,3 +63,24 @@ class TokenAndPositionEmbedding(layers.Layer):
         positions = self.pos_emb(positions)
         x = self.token_emb(x)
         return x + positions
+
+vocab_size = 20000 
+maxlen = 80
+embed_dim = 256
+num_heads = 2
+feed_forward_dim = 256
+
+def create_model():
+    inputs = layers.Input(shape=(maxlen,), dtype="int32")
+    embedding_layer = TokenAndPositionEmbedding(maxlen, vocab_size, embed_dim)
+    x = embedding_layer(inputs)
+    transformer_block = TransformerBlock(embed_dim, num_heads, feed_forward_dim)
+    x = transformer_block(x)
+    outputs = layers.Dense(vocab_size)(x)
+    model = keras.Model(inputs=inputs, outputs=[outputs, x])
+    loss_fn = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    model.compile(
+        "adam",
+        loss=[loss_fn, None],
+    )
+    return model
