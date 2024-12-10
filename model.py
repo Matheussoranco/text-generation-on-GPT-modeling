@@ -84,3 +84,57 @@ def create_model():
         loss=[loss_fn, None],
     )
     return model
+
+!curl -O https://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz
+!tar -xf aclImdb_v1.tar.gz
+
+batch_size = 128
+
+filenames = []
+directories = [
+    "aclImdb/train/pos",
+    "aclImdb/train/neg",
+    "aclImdb/test/pos",
+    "aclImdb/test/neg",
+]
+for dir in directories:
+    for f in os.listdir(dir):
+        filenames.append(os.path.join(dir, f))
+
+print(f"{len(filenames)} files")
+
+random.shuffle(filenames)
+text_ds = tf_data.TextLineDataset(filenames)
+text_ds = text_ds.shuffle(buffer_size=256)
+text_ds = text_ds.batch(batch_size)
+
+
+def custom_standardization(input_string):
+    """Remover tags de quebra de linha do HTML e pontuação"""
+    lowercased = tf_strings.lower(input_string)
+    stripped_html = tf_strings.regex_replace(lowercased, "<br />"," ")
+    return tf_strings.regex_replace(stripped_html, f"([{string.punctuation}])", r" \1")
+
+vectorize_layer = TextVectorization(
+    standardize=custom_standardization,
+    max_tokens=vocab_size - 1,
+    output_mode="int",
+    output_sequence_length=maxlen + 1,
+)
+vectorize_layer.adapt(text_ds)
+vocab = vectorize_layer.get_vocabulary()
+
+def prepare_lm_imputs_labels(text):
+    """
+    Mude as sequências de palavras em 1 posição para que o alvo da posição (i) seja
+    palavra na posição (i+1). O modelo usará todas as palavras até a posição (i)
+    para prever a próxima palavra.
+    """
+    text = tensorflow.expand_dims(text, -1)
+    tokennized_sentences = vectorize_layer(text)
+    x = tokennized_sentences[:, :-1]
+    y = tokennized_sentences[: 1:]
+    return x, y
+
+text_ds = text_ds.map(prepare_lm_imputs_labels, num_parallel_calls=tf_data.AUTOTUNE)
+text_ds = text_ds.prefetch(tf_data.AUTOTUNE)
