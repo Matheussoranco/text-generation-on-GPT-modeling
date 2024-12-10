@@ -1,6 +1,7 @@
 # text-generation-on-GPT-modeling
 A Text generation GPT model. It implements an autoregressive language model using a miniature version of the GPT model. The model consists of a single Transformer block with causal masking in its attention layer. We use the text from the IMDB sentiment classification dataset for training and generate new movie reviews for a given prompt. When using this script with your own dataset, make sure it has at least 1 million words.
 
+There is the code and a notebook wich i used to test and execute the code.
 This should be runned in a GPU.
 
 Sources:
