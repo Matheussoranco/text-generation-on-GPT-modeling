@@ -199,7 +199,7 @@ word_to_index = {}
 for index, word in enumerate(vocab):
     word_to_index[word] = index
 
-start_prompt = "This movie is"
+start_prompt = "this movie is"
 start_tokens = [word_to_index.get(_, 1) for _ in start_prompt.split()]
 num_tokens_generated = 40
 text_gen_callback = TextGenerator(num_tokens_generated, start_tokens, vocab)
