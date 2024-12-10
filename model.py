@@ -30,7 +30,7 @@ class TransformerBlock(layers.Layer):
         self.att = layers.MultiHeadAttention(num_heads, embed_dim)
         self.ffn = keras.Sequential(
             [
-                layers.Danse(ff_dim, activation="relu"),
+                layers.Dense(ff_dim, activation="relu"),
                 layers.Dense(embed_dim),
             ]
         )
@@ -208,3 +208,6 @@ start_prompt = "this movie is"
 start_tokens = [word_to_index.get(_, 1) for _ in start_prompt.split()]
 num_tokens_generated = 40
 text_gen_callback = TextGenerator(num_tokens_generated, start_tokens, vocab)
+
+#model = create_model()
+#model.fit(text_ds, verbose=2, epochs=25, callbacks=[text_gen_callback])
