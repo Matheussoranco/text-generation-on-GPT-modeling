@@ -139,7 +139,7 @@ def prepare_lm_imputs_labels(text):
 text_ds = text_ds.map(prepare_lm_imputs_labels, num_parallel_calls=tf_data.AUTOTUNE)
 text_ds = text_ds.prefetch(tf_data.AUTOTUNE)
 
-class TextGenerato(keras.callbacks.Callback):
+class TextGenerator(keras.callbacks.Callback):
     """
     Um retorno de chamada para gerar texto de um modelo treinado.
     1. Envie alguns prompts iniciais para o modelo
